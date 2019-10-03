@@ -296,6 +296,7 @@ namespace IxosTest2
             {
                 result.ConnectionSettings.SerPort = cmbBasic2SerialPort.Text;
             }
+            result.ConnectionSettings.IsOnLAN = isOnLAN.Checked;
             return result;
         }
         #endregion
@@ -476,6 +477,7 @@ namespace IxosTest2
             string ip = txtBasic2IpAddress.Text;
             Int32 ipPort = Convert.ToInt32(txtBasic2IpPort.Text);
             string comPort = cmbBasic2SerialPort.Text;
+            ComManager.SSIDCheck = !isOnLAN.Checked;
             try
             {
                 //if (rbAutoDetect.Checked)
@@ -486,7 +488,7 @@ namespace IxosTest2
                 //}
                 if (rbTcp.Checked || rbUdp.Checked)
                 {
-                    if (!ComManager.ConnectedToPmcNetwork)
+                    if (!ComManager.ConnectedToPmcNetwork && !isOnLAN.Checked)
                     {
                         DumpLine("Not connected to a PMC-8 network.  Can not send: " + cmd);
                         MessageBox.Show("Please connect to a PMC-8 network before using TCP or UDP", "Information");
@@ -597,7 +599,7 @@ namespace IxosTest2
                 if (mount == null)
                 {
                     Console.WriteLine("error");
-                    MessageBox.Show("The mount is currently busy. Please try again in a second, or use 'Find Ccurrent Connection' if required", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("The mount is currently busy. Please try again in a second, or use 'Find Current Connection' if required", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
                 if (mount?.ConnectionSettings?.IsConnected == ConnectionEnum.Serial)
@@ -617,7 +619,7 @@ namespace IxosTest2
             catch (Exception ex)
             {
                 Dump("Could not switch.");
-                MessageBox.Show("The mount is currently busy. Please try again in a second, or use 'Find Ccurrent Connection' if required", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show("The mount is currently busy. Please try again in a second, or use 'Find Current Connection' if required", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
             }
             finally
             {
@@ -633,7 +635,7 @@ namespace IxosTest2
             bool setSsidTimer = false;
             try
             {
-                if (ComManager.ConnectedToPmcNetwork == false)
+                if (!ComManager.ConnectedToPmcNetwork && !isOnLAN.Checked)
                 {
                     MessageBox.Show("You must be connected to a PMC-8 network. Please connect to a PMC-8 network and try again", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
@@ -646,7 +648,7 @@ namespace IxosTest2
                 }
                 if (mount == null)
                 {
-                    MessageBox.Show("The mount is currently busy. Please try again in a second, or use 'Find Ccurrent Connection' if required", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    MessageBox.Show("The mount is currently busy. Please try again in a second, or use 'Find Current Connection' if required", "Information", MessageBoxButtons.OK, MessageBoxIcon.Information);
                     return;
                 }
                 if (mount.ConnectionSettings.IsConnected == ConnectionEnum.UDP)
@@ -702,7 +704,7 @@ namespace IxosTest2
                     MessageBox.Show("G-11 and EXOS-2 user do not need to use UDP mode.");
                     return;
                 }
-                if (ComManager.ConnectedToPmcNetwork == false)
+                if (!ComManager.ConnectedToPmcNetwork && !isOnLAN.Checked)
                 {
                     MessageBox.Show("You must be connected to a PMC-8 network. Please connect to a PMC-8 network and try again", "Information");
                     return;
@@ -1299,6 +1301,12 @@ namespace IxosTest2
         private void Label23_Click(object sender, EventArgs e)
         {
 
+        }
+
+        private void isOnLAN_CheckedChanged(object sender, EventArgs e)
+        {
+            txtBasic2IpAddress.Enabled = isOnLAN.Checked;
+            txtBasic2IpPort.Enabled = isOnLAN.Checked;
         }
     }
 }

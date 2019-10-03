@@ -69,16 +69,22 @@ namespace IxosTest2
         {
             EsEventManager.PublishEsEvent(EsEventSenderEnum.EsMountManager, EsMessagePriority.DebugInfo, "    Start Verify TCP Connection");
 
-            //Check Wireless first
-            if (!CommunicationsManager.IsConnectedToWirelessNetwork())
+            //Check Wireless first, but only if not on LAN
+            if (!mount.ConnectionSettings.IsOnLAN) 
             {
-
-                return false;
+                if (!CommunicationsManager.IsConnectedToWirelessNetwork())
+                {
+                    return false;
+                }
+                if (!CommunicationsManager.ConnectedSsid().Contains("PMC"))
+                {
+                    return false;
+                }
+                CommunicationsManager.SSIDCheck = true;
             }
-            if (!CommunicationsManager.ConnectedSsid().Contains("PMC"))
+            else
             {
-
-                return false;
+                CommunicationsManager.SSIDCheck = false;
             }
             bool responseIsGood = false;
             try

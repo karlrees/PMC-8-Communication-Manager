@@ -16,6 +16,7 @@ namespace IxosTest2
 
         #region Properies
         public event EventHandler<SsidEventArgs> SsidTimerHit;
+        public bool SSIDCheck = true;
         public int interval = 1000;
         public System.Timers.Timer SsidTimer { get; set; }
 
@@ -25,6 +26,7 @@ namespace IxosTest2
             SsidTimer.Elapsed += SsidTimers_Elapsed;
             SsidTimer.Start();
         }
+
         public bool ConnectedToPmcNetwork
         {
             get
@@ -58,7 +60,7 @@ namespace IxosTest2
         }
         public string SendTcpMessageOLD(string ipAddr, Int32 comPort, string msg)
         {
-            if (!ConnectedToPmcNetwork)
+            if (!ConnectedToPmcNetwork && SSIDCheck)
             {
                 throw new EsException("Must be connected to PMC=8 network.");
             }
@@ -112,12 +114,12 @@ namespace IxosTest2
         {
             EsEventManager.PublishEsEvent(EsEventSenderEnum.ComManager, EsMessagePriority.DetailedInfo, "    Start Sending UDP Message: " +msg);
 
-            UdpClient udpClient = new UdpClient(54372);
+            UdpClient udpClient = new UdpClient(comPort);
             udpClient.Client.ReceiveTimeout = 1500;
             string returnData = "No Data Received";
             try
             {
-                udpClient.Connect("192.168.47.1", 54372);
+                udpClient.Connect(ipAddr, comPort);
 
                 // Sends a message to the host to which you have connected.
                 Byte[] sendBytes = Encoding.ASCII.GetBytes(msg + Environment.NewLine);
@@ -127,7 +129,7 @@ namespace IxosTest2
                 // Sends a message to a different host using optional hostname and port parameters.
                 UdpClient udpClientB = new UdpClient();
                 Thread.Sleep(1000);
-                udpClientB.Send(sendBytes, sendBytes.Length, "192.168.47.1", 54372);
+                udpClientB.Send(sendBytes, sendBytes.Length, ipAddr, comPort);
 
                 //IPEndPoint object will allow us to read datagrams sent from any source.
                 IPEndPoint RemoteIpEndPoint = new IPEndPoint(IPAddress.Any, 0);
