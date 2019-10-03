@@ -29,6 +29,7 @@ namespace IxosTest2
         {
             IsConnected = ConnectionEnum.NONE;
         }
+        public bool IsOnLAN { get; set; }
 
     }
     public enum ConnectionEnum
